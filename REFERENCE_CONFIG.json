@@ -1,0 +1,87 @@
+{
+  "storageKey": "fluid_glass_material_config",
+  "quality": "auto",
+  "interaction": true,
+  "cards": [
+    {
+      "key": "card-01",
+      "label": "Metric 01",
+      "eyebrow": "SIGNAL 01",
+      "value": "12",
+      "unit": "units",
+      "change": 20,
+      "preset": "cyan",
+      "a": "#00e7d2",
+      "b": "#3cc8ff",
+      "c": "#075f68",
+      "speed": 0.92,
+      "intensity": 1.02,
+      "pointer": 0.82,
+      "surface": 0.08,
+      "seed": 1.7,
+      "chart": {
+        "enabled": false
+      }
+    },
+    {
+      "key": "card-02",
+      "label": "Metric 02",
+      "eyebrow": "SIGNAL 02",
+      "value": "28",
+      "unit": "units",
+      "change": 8,
+      "preset": "cyan",
+      "a": "#00e7d2",
+      "b": "#3cc8ff",
+      "c": "#075f68",
+      "speed": 0.84,
+      "intensity": 1.08,
+      "pointer": 0.8,
+      "surface": 0.08,
+      "seed": 4.9,
+      "chart": {
+        "enabled": false
+      }
+    },
+    {
+      "key": "card-03",
+      "label": "Metric 03",
+      "eyebrow": "SIGNAL 03",
+      "value": "56",
+      "unit": "units",
+      "change": 15,
+      "preset": "cyan",
+      "a": "#00e7d2",
+      "b": "#3cc8ff",
+      "c": "#075f68",
+      "speed": 0.76,
+      "intensity": 0.98,
+      "pointer": 0.72,
+      "surface": 0.08,
+      "seed": 8.4,
+      "chart": {
+        "enabled": false
+      }
+    },
+    {
+      "key": "card-04",
+      "label": "Metric 04",
+      "eyebrow": "SIGNAL 04",
+      "value": "3",
+      "unit": "units",
+      "change": -40,
+      "preset": "cyan",
+      "a": "#00e7d2",
+      "b": "#3cc8ff",
+      "c": "#075f68",
+      "speed": 0.88,
+      "intensity": 1.05,
+      "pointer": 0.86,
+      "surface": 0.08,
+      "seed": 12.1,
+      "chart": {
+        "enabled": false
+      }
+    }
+  ]
+}

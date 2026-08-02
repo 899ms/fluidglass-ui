@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluid Glass Material — Canonical Reference</title>
+<style>
+/*
+  Fluid Glass UI — Canonical Material Core
+  Keep the geometry, layer ordering, opacity budget, and fallback composition intact.
+*/
+:root {
+  --fg-page-bg: #050706;
+  --fg-page-text: #eefcf8;
+  --fg-gap: 14px;
+  --fg-card-height: 144px;
+  --fg-card-radius: 30px;
+  --fg-panel-radius: 24px;
+  --fg-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", Arial, sans-serif;
+  --fg-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { min-width: 100%; min-height: 100%; margin: 0; }
+body {
+  color: var(--fg-page-text);
+  font-family: var(--fg-font-sans);
+  background:
+    radial-gradient(circle at 55% 28%, rgba(0, 231, 210, .055), transparent 34%),
+    radial-gradient(circle at 15% 0%, rgba(255, 255, 255, .032), transparent 22%),
+    var(--fg-page-bg);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .10;
+  background-image: radial-gradient(rgba(255, 255, 255, .22) .55px, transparent .62px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 85%);
+}
+.fg-shell { min-height: 100vh; padding: 28px; }
+.fg-toolbar {
+  max-width: 1160px;
+  min-height: 52px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.fg-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dff7f1;
+  font-weight: 600;
+  letter-spacing: -.015em;
+}
+.fg-brand-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #00e7d2;
+  box-shadow: 0 0 12px rgba(0,231,210,.78);
+}
+.fg-toolbar-actions { display: flex; gap: 8px; }
+.fg-icon-button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(77,235,207,.22);
+  border-radius: 50%;
+  background: rgba(0,231,210,.055);
+  color: #9ad9ca;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.fg-icon-button:hover,
+.fg-icon-button:focus-visible {
+  color: #dffff7;
+  border-color: rgba(77,235,207,.42);
+  background: rgba(0,231,210,.11);
+  box-shadow: 0 0 20px rgba(0,231,210,.08);
+  outline: none;
+}
+.fg-icon-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+
+.fg-grid {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--fg-gap);
+}
+.fg-card {
+  --fluid-a: #00e7d2;
+  --fluid-b: #3cc8ff;
+  --fluid-c: #075f68;
+  --surface-opacity: .08;
+  --content-shade: .425;
+  --content-shade-mid: .306;
+  --content-shade-soft: .136;
+  --top-glow: .032;
+  --bottom-shade: .092;
+  --stat-text: #f3fffb;
+  --stat-title: #d8eee8;
+  --stat-muted: #8fa9a2;
+  --stat-eyebrow: #82a69d;
+  --stat-change: #819b94;
+  --edge-highlight: .12;
+  position: relative;
+  min-width: 0;
+  height: var(--fg-card-height);
+  padding: 0;
+  border: 1px solid rgba(153,255,237,.18);
+  border-radius: var(--fg-card-radius);
+  overflow: hidden;
+  isolation: isolate;
+  color: #eefcf8;
+  background-color: rgba(255,255,255,var(--surface-opacity));
+  -webkit-backdrop-filter: blur(16px) saturate(118%);
+  backdrop-filter: blur(16px) saturate(118%);
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.28),
+    0 2px 8px rgba(0,0,0,.16),
+    inset 0 1px 0 rgba(222,255,248,.10),
+    inset 0 -1px 0 rgba(0,0,0,.24);
+  cursor: default;
+  transform: translateZ(0);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .28s ease;
+}
+.fg-card:hover,
+.fg-card.is-selected {
+  transform: translateY(-3px);
+  border-color: rgba(111,255,228,.38);
+  box-shadow:
+    0 23px 42px rgba(0,0,0,.36),
+    0 3px 9px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(226,255,249,.15),
+    0 0 0 1px rgba(91,246,218,.08),
+    0 0 32px rgba(0,231,210,.10);
+}
+.fg-fluid-canvas,
+.fg-fluid-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.fg-fluid-canvas {
+  z-index: 0;
+  display: block;
+  opacity: .96;
+  transform: scale(1.035);
+  filter: saturate(1.10) contrast(1.04) blur(1.8px);
+  mix-blend-mode: normal;
+}
+.fg-fluid-fallback {
+  z-index: -1;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse at 82% 18%, color-mix(in srgb,var(--fluid-a),transparent 10%) 0 8%, transparent 42%),
+    radial-gradient(ellipse at 62% 88%, color-mix(in srgb,var(--fluid-b),transparent 18%) 0 13%, transparent 52%),
+    radial-gradient(ellipse at 98% 58%, color-mix(in srgb,var(--fluid-c),transparent 8%) 0 10%, transparent 48%),
+    radial-gradient(ellipse at 48% 45%, rgba(0,231,210,.12), transparent 58%);
+  background-size: 130% 145%, 150% 155%, 135% 150%, 115% 125%;
+  background-color: transparent;
+  mix-blend-mode: normal;
+  animation: fgFluidFallbackDrift 9s ease-in-out infinite alternate;
+}
+.fg-card.is-fallback .fg-fluid-canvas { display: none; }
+.fg-card.is-fallback .fg-fluid-fallback { z-index: 0; opacity: .92; }
+@keyframes fgFluidFallbackDrift {
+  0% { background-position: 100% 0,70% 100%,100% 50%,35% 40%; filter: saturate(1) blur(0); }
+  50% { background-position: 78% 20%,92% 72%,70% 34%,56% 60%; filter: saturate(1.14) blur(.35px); }
+  100% { background-position: 100% 30%,58% 84%,94% 70%,42% 48%; filter: saturate(1.04) blur(0); }
+}
+.fg-card::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      rgba(2,10,8,var(--content-shade)) 0%,
+      rgba(3,13,11,var(--content-shade-mid)) 28%,
+      rgba(3,14,12,var(--content-shade-soft)) 50%,
+      transparent 76%),
+    linear-gradient(180deg,rgba(208,255,246,var(--top-glow)),transparent 34%,rgba(0,0,0,var(--bottom-shade)));
+}
+.fg-card::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,var(--edge-highlight)),
+    inset 0 -1px 2px rgba(0,0,0,.26),
+    inset -22px 0 34px rgba(0,231,210,.025);
+}
+.fg-noise {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: .075;
+  mix-blend-mode: soft-light;
+  background-image:
+    radial-gradient(circle at 20% 30%,rgba(220,255,248,.70) 0 .42px,transparent .78px),
+    radial-gradient(circle at 70% 65%,rgba(0,40,34,.78) 0 .4px,transparent .75px);
+  background-size: 4px 4px,5px 5px;
+}
+.fg-content {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  padding: 18px 20px 16px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  color: var(--stat-text);
+  text-shadow: 0 1px 10px rgba(0,0,0,.34);
+}
+.fg-eyebrow { margin: 0 0 4px; max-width: 78%; color: var(--stat-eyebrow); font-size: 10px; line-height: 1.25; font-weight: 600; letter-spacing: .065em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fg-title { margin: 0 0 5px; color: var(--stat-title); font-size: 15px; line-height: 1.25; font-weight: 600; }
+.fg-value { color: var(--stat-text); font-size: 38px; line-height: .98; font-weight: 500; letter-spacing: -.035em; }
+.fg-unit { color: var(--stat-muted); font-size: 11px; margin-left: 5px; text-shadow: none; }
+.fg-change { margin-top: 6px; color: var(--stat-change); font-size: 10px; line-height: 1.35; }
+.fg-change-positive { color: #35e9bb; font-weight: 500; }
+.fg-change-negative { color: #ff7280; font-weight: 500; }
+
+/* The chart is an optional extension and is OFF by default. */
+.fg-chart { display: none; }
+.fg-card[data-chart-enabled="true"] .fg-chart { display: block; position: absolute; z-index: 2; inset: auto 18px 15px 18px; height: 40px; }
+
+.fg-panel-backdrop { position: fixed; z-index: 990; inset: 0; background: rgba(0,0,0,.42); backdrop-filter: blur(4px); opacity: 0; transition: opacity .24s ease; }
+.fg-panel-backdrop.is-open { opacity: 1; }
+.fg-panel { position: fixed; z-index: 1000; top: 18px; right: 18px; bottom: 18px; width: min(360px,calc(100vw - 36px)); display: flex; flex-direction: column; color: #e9efec; background: linear-gradient(155deg,rgba(28,34,32,.97),rgba(8,12,11,.98)); border: 1px solid rgba(255,255,255,.13); border-radius: var(--fg-panel-radius); box-shadow: 0 30px 100px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,255,255,.08); transform: translateX(calc(100% + 34px)); opacity: 0; pointer-events: none; transition: transform .34s cubic-bezier(.2,.8,.2,1),opacity .24s ease; overflow: hidden; }
+.fg-panel.is-open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+.fg-panel-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 22px 22px 17px; border-bottom: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg,rgba(255,255,255,.035),transparent); }
+.fg-panel-kicker { display: block; margin-bottom: 5px; color: #65dbab; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
+.fg-panel h2 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
+.fg-panel-close { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); color: #b8c1bc; font-size: 22px; cursor: pointer; }
+.fg-panel-body { flex: 1; min-height: 0; overflow: auto; padding: 18px 20px 24px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.12) transparent; }
+.fg-field { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: #9ba7a1; font-size: 12px; }
+.fg-field select { min-width: 150px; height: 36px; padding: 0 34px 0 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 11px; background: #111614; color: #e8eeeb; outline: none; }
+.fg-preview { position: relative; height: 94px; margin: 16px 0 19px; overflow: hidden; border: 1px solid rgba(111,255,228,.22); border-radius: 24px; background: radial-gradient(ellipse at 88% 15%,color-mix(in srgb,var(--preview-a,#00e7d2),transparent 14%),transparent 48%), radial-gradient(ellipse at 68% 92%,color-mix(in srgb,var(--preview-b,#3cc8ff),transparent 18%),transparent 54%), radial-gradient(ellipse at 96% 58%,color-mix(in srgb,var(--preview-c,#075f68),transparent 8%),transparent 50%), rgba(255,255,255,var(--preview-surface,.08)); box-shadow: 0 13px 26px rgba(0,0,0,.35),inset 0 1px 0 rgba(226,255,249,.10); }
+.fg-preview::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(2,10,8,var(--preview-shade,.43)) 0 30%,rgba(2,11,9,var(--preview-shade-mid,.24)) 43%,transparent 72%); }
+.fg-preview-copy { position: relative; z-index: 2; height: 100%; padding: 17px 20px; display: flex; flex-direction: column; align-items: flex-start; color: var(--preview-text,#e8f8f3); }
+.fg-preview-copy small { font-size: 8px; letter-spacing: .12em; color: var(--preview-muted,#71938a); }
+.fg-preview-copy b { font-size: 17px; margin-top: 4px; }
+.fg-preview-copy span { font-size: 9px; color: var(--preview-muted,#7f9e96); margin-top: 3px; }
+.fg-fieldset { margin: 0 0 18px; padding: 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 15px; background: rgba(255,255,255,.025); }
+.fg-fieldset legend { padding: 0 7px; color: #aab4af; font-size: 11px; font-weight: 600; }
+.fg-presets { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.fg-presets button { padding: 5px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: #89948e; font-size: 8px; cursor: pointer; }
+.fg-presets button:hover,.fg-presets button.active { border-color: rgba(0,230,118,.34); background: rgba(0,230,118,.07); color: #e9fff4; }
+.fg-presets i { display: block; height: 38px; margin-bottom: 5px; border-radius: 12px; background: radial-gradient(circle at 78% 18%,var(--a),transparent 50%),radial-gradient(circle at 64% 90%,var(--b),transparent 55%),radial-gradient(circle at 100% 60%,var(--c),transparent 58%),rgba(3,12,10,.72); border: 1px solid rgba(115,255,229,.16); }
+.fg-color-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+.fg-color-grid label { display: flex; flex-direction: column; gap: 6px; color: #8e9993; font-size: 9px; }
+.fg-color-grid input { width: 100%; height: 39px; padding: 2px; border: 1px solid rgba(255,255,255,.11); border-radius: 10px; background: #101513; cursor: pointer; }
+.fg-color-grid code { font-family: var(--fg-font-mono); font-size: 8px; color: #aeb8b3; }
+.fg-range { display: block; margin-bottom: 14px; }
+.fg-range:last-child { margin-bottom: 0; }
+.fg-range > span { display: flex; justify-content: space-between; margin-bottom: 7px; color: #a9b2ae; font-size: 10px; }
+.fg-range output { color: #e5ebe8; font-variant-numeric: tabular-nums; }
+.fg-range input { width: 100%; accent-color: #00c873; }
+.fg-switch { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.065); cursor: pointer; }
+.fg-switch span { display: flex; flex-direction: column; }
+.fg-switch b { font-size: 11px; color: #d8dfdc; }
+.fg-switch small { font-size: 8px; color: #747f79; margin-top: 3px; }
+.fg-switch input { position: absolute; opacity: 0; }
+.fg-switch i { position: relative; width: 40px; height: 22px; border-radius: 12px; background: #252b28; border: 1px solid rgba(255,255,255,.09); transition: .2s; }
+.fg-switch i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: #8e9893; transition: .2s; }
+.fg-switch input:checked + i { background: rgba(0,201,113,.25); border-color: rgba(0,230,118,.42); }
+.fg-switch input:checked + i::after { left: 21px; background: #18e996; box-shadow: 0 0 10px rgba(24,233,150,.55); }
+.fg-diagnostic { display: flex; align-items: center; gap: 8px; margin-top: 13px; padding: 10px 11px; border-radius: 10px; background: rgba(0,0,0,.22); color: #87918c; font-size: 9px; }
+.fg-diagnostic i { width: 7px; height: 7px; border-radius: 50%; background: #f0b24f; box-shadow: 0 0 9px rgba(240,178,79,.5); }
+.fg-diagnostic.ok i { background: #13df8c; box-shadow: 0 0 9px rgba(19,223,140,.65); }
+.fg-diagnostic.warn i { background: #ff5d65; box-shadow: 0 0 9px rgba(255,93,101,.55); }
+.fg-panel-actions { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 8px; padding: 14px 18px 18px; border-top: 1px solid rgba(255,255,255,.08); background: rgba(3,6,5,.42); }
+.fg-panel-actions button { min-height: 39px; padding: 0 9px; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: rgba(255,255,255,.045); color: #aeb7b2; font-size: 9px; cursor: pointer; }
+.fg-panel-actions button.primary { border-color: rgba(0,230,118,.35); background: linear-gradient(180deg,rgba(0,215,117,.28),rgba(0,130,69,.22)); color: #eafff3; }
+.fg-toast { position: fixed; z-index: 1100; right: 24px; bottom: 24px; padding: 10px 14px; border: 1px solid rgba(0,230,118,.30); border-radius: 12px; background: rgba(8,16,13,.94); color: #dffff0; font-size: 11px; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
+.fg-toast.show { opacity: 1; transform: none; }
+
+@media (max-width: 1040px) {
+  .fg-grid { grid-template-columns: repeat(2,minmax(0,1fr)); max-width: 720px; }
+}
+@media (max-width: 620px) {
+  .fg-shell { padding: 18px; }
+  .fg-grid { grid-template-columns: 1fr; max-width: 360px; }
+  .fg-card { height: 144px; /* keep the canonical wide-card silhouette; never become square */ }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fg-fluid-fallback { animation: none; }
+  .fg-card { transition: none; }
+}
+</style>
+<script>window.FLUID_GLASS_CONFIG = {"storageKey": "fluid_glass_material_config", "quality": "auto", "interaction": true, "cards": [{"key": "card-01", "label": "Metric 01", "eyebrow": "SIGNAL 01", "value": "12", "unit": "units", "change": 20, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.92, "intensity": 1.02, "pointer": 0.82, "surface": 0.08, "seed": 1.7, "chart": {"enabled": false}}, {"key": "card-02", "label": "Metric 02", "eyebrow": "SIGNAL 02", "value": "28", "unit": "units", "change": 8, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.84, "intensity": 1.08, "pointer": 0.8, "surface": 0.08, "seed": 4.9, "chart": {"enabled": false}}, {"key": "card-03", "label": "Metric 03", "eyebrow": "SIGNAL 03", "value": "56", "unit": "units", "change": 15, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.76, "intensity": 0.98, "pointer": 0.72, "surface": 0.08, "seed": 8.4, "chart": {"enabled": false}}, {"key": "card-04", "label": "Metric 04", "eyebrow": "SIGNAL 04", "value": "3", "unit": "units", "change": -40, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.88, "intensity": 1.05, "pointer": 0.86, "surface": 0.08, "seed": 12.1, "chart": {"enabled": false}}]};</script>
+</head>
+<body>
+  <main class="fg-shell">
+    <header class="fg-toolbar">
+      <div class="fg-brand"><span class="fg-brand-dot"></span><span>Fluid Glass Material</span></div>
+      <div class="fg-toolbar-actions">
+        <button class="fg-icon-button" id="fluidGlassExport" type="button" aria-label="Export HTML">
+          <svg viewBox="0 0 24 24"><path d="M12 4v11M8 8l4-4 4 4M4 20h16"/></svg>
+        </button>
+        <button class="fg-icon-button" id="fluidGlassSettingsButton" type="button" aria-label="Open settings">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M8 14v6"/></svg>
+        </button>
+      </div>
+    </header>
+    <section class="fg-grid" id="fluidGlassGrid" aria-label="Fluid glass cards"></section>
+  </main>
+
+  <div class="fg-panel-backdrop" id="fluidGlassBackdrop" hidden></div>
+  <aside class="fg-panel" id="fluidGlassPanel" aria-hidden="true" aria-labelledby="fluidGlassPanelTitle">
+    <div class="fg-panel-head">
+      <div><span class="fg-panel-kicker">CANONICAL MATERIAL CORE</span><h2 id="fluidGlassPanelTitle">Fluid glass settings</h2></div>
+      <button class="fg-panel-close" id="fluidGlassPanelClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="fg-panel-body">
+      <label class="fg-field"><span>Current card</span><select id="fluidGlassCardSelect"></select></label>
+      <div class="fg-preview" id="fluidGlassPreview"><div class="fg-preview-copy"><small>LIVE MATERIAL</small><b id="fluidGlassPreviewName">Metric 01</b><span>Transparent glass · cyan fluid</span></div></div>
+      <fieldset class="fg-fieldset"><legend>Palette presets</legend><div class="fg-presets">
+        <button type="button" data-fluid-glass-preset="cyan"><i style="--a:#00e7d2;--b:#3cc8ff;--c:#075f68"></i><span>Cyan</span></button>
+        <button type="button" data-fluid-glass-preset="original"><i style="--a:#ff3aa7;--b:#ff8050;--c:#a443ff"></i><span>Original</span></button>
+        <button type="button" data-fluid-glass-preset="klein"><i style="--a:#3158ff;--b:#ff6531;--c:#20252e"></i><span>Klein</span></button>
+        <button type="button" data-fluid-glass-preset="chrome"><i style="--a:#eef2f3;--b:#6c7780;--c:#11171d"></i><span>Chrome</span></button>
+      </div></fieldset>
+      <fieldset class="fg-fieldset"><legend>Custom colors</legend><div class="fg-color-grid">
+        <label><span>Color A</span><input type="color" id="fluidGlassColorA"><code id="fluidGlassColorAText"></code></label>
+        <label><span>Color B</span><input type="color" id="fluidGlassColorB"><code id="fluidGlassColorBText"></code></label>
+        <label><span>Shadow C</span><input type="color" id="fluidGlassColorC"><code id="fluidGlassColorCText"></code></label>
+      </div></fieldset>
+      <fieldset class="fg-fieldset"><legend>Card surface</legend>
+        <label class="fg-range"><span>Surface opacity <output id="fluidGlassSurfaceValue"></output></span><input type="range" id="fluidGlassSurface" min="0" max="100" step="1"></label>
+      </fieldset>
+      <fieldset class="fg-fieldset"><legend>Motion</legend>
+        <label class="fg-range"><span>Flow speed <output id="fluidGlassSpeedValue"></output></span><input type="range" id="fluidGlassSpeed" min="0" max="2" step="0.05"></label>
+        <label class="fg-range"><span>Fluid intensity <output id="fluidGlassIntensityValue"></output></span><input type="range" id="fluidGlassIntensity" min="0.35" max="1.6" step="0.05"></label>
+        <label class="fg-range"><span>Pointer disturbance <output id="fluidGlassPointerValue"></output></span><input type="range" id="fluidGlassPointer" min="0" max="1.5" step="0.05"></label>
+      </fieldset>
+      <fieldset class="fg-fieldset"><legend>Performance</legend>
+        <label class="fg-field"><span>Render quality</span><select id="fluidGlassQuality"><option value="auto">Auto</option><option value="high">High</option><option value="balanced">Balanced</option><option value="eco">Eco</option><option value="fallback">CSS fallback</option></select></label>
+        <label class="fg-switch"><span><b>Pointer interaction</b><small>Push and curl the fluid</small></span><input type="checkbox" id="fluidGlassInteraction"><i></i></label>
+        <div class="fg-diagnostic" id="fluidGlassDiagnostic"><i></i><span>Detecting WebGL…</span></div>
+      </fieldset>
+    </div>
+    <div class="fg-panel-actions">
+      <button type="button" id="fluidGlassResetCard">Restore card</button>
+      <button type="button" id="fluidGlassApplyAll">Apply material to all</button>
+      <button type="button" class="primary" id="fluidGlassSaveSettings">Save settings</button>
+    </div>
+  </aside>
+  <div class="fg-toast" id="fluidGlassToast">Saved</div>
+  <script>
+(() => {
+  'use strict';
+
+  const CANONICAL_STORAGE_KEY = 'fluid_glass_material_config';
+  const QUALITY_VALUES = ['auto', 'high', 'balanced', 'eco', 'fallback'];
+  const PRESETS = {
+    cyan: { a: '#00e7d2', b: '#3cc8ff', c: '#075f68' },
+    original: { a: '#ff3aa7', b: '#ff8050', c: '#a443ff' },
+    klein: { a: '#3158ff', b: '#ff6531', c: '#20252e' },
+    chrome: { a: '#eef2f3', b: '#6c7780', c: '#11171d' }
+  };
+  const DEFAULT_CARD_VARIANTS = [
+    { speed: .92, intensity: 1.02, pointer: .82, surface: .08, seed: 1.7 },
+    { speed: .84, intensity: 1.08, pointer: .80, surface: .08, seed: 4.9 },
+    { speed: .76, intensity: .98, pointer: .72, surface: .08, seed: 8.4 },
+    { speed: .88, intensity: 1.05, pointer: .86, surface: .08, seed: 12.1 }
+  ];
+
+  const clone = (obj) => JSON.parse(JSON.stringify(obj));
+  const clamp = (n, a, b) => { n = Number(n); return Number.isFinite(n) ? Math.min(b, Math.max(a, n)) : a; };
+  const smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  const hexOk = (value) => /^#[0-9a-f]{6}$/i.test(value || '');
+  const safeHex = (value, fallback) => hexOk(value) ? value.toLowerCase() : fallback;
+  const slugKey = (value, index) => {
+    const candidate = String(value || '').trim().replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase();
+    return candidate || `card-${String(index + 1).padStart(2, '0')}`;
+  };
+  const HTML_ENTITIES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ENTITIES[char]);
+
+  function defaultCards(count = 4) {
+    return Array.from({ length: count }, (_, index) => {
+      const variant = DEFAULT_CARD_VARIANTS[index % DEFAULT_CARD_VARIANTS.length];
+      return {
+        key: `card-${String(index + 1).padStart(2, '0')}`,
+        label: `Metric ${String(index + 1).padStart(2, '0')}`,
+        eyebrow: `SIGNAL ${String(index + 1).padStart(2, '0')}`,
+        value: String([12, 28, 56, 3][index % 4]),
+        unit: 'units',
+        change: [20, 8, 15, -40][index % 4],
+        preset: 'cyan',
+        ...PRESETS.cyan,
+        ...variant,
+        chart: { enabled: false }
+      };
+    });
+  }
+
+  const DEFAULTS = {
+    storageKey: CANONICAL_STORAGE_KEY,
+    quality: 'auto',
+    interaction: true,
+    cards: defaultCards(4)
+  };
+
+  function normalizeCard(card, index) {
+    const variant = DEFAULT_CARD_VARIANTS[index % DEFAULT_CARD_VARIANTS.length];
+    const base = defaultCards(index + 1)[index];
+    const palette = PRESETS[card?.preset] || PRESETS.cyan;
+    return {
+      ...base,
+      ...variant,
+      ...(card || {}),
+      key: slugKey(card?.key, index),
+      label: String(card?.label ?? base.label),
+      eyebrow: String(card?.eyebrow ?? base.eyebrow),
+      value: String(card?.value ?? base.value),
+      unit: String(card?.unit ?? base.unit),
+      change: Number.isFinite(Number(card?.change)) ? Number(card.change) : base.change,
+      preset: typeof card?.preset === 'string' ? card.preset : 'cyan',
+      a: safeHex(card?.a, palette.a),
+      b: safeHex(card?.b, palette.b),
+      c: safeHex(card?.c, palette.c),
+      speed: clamp(Number(card?.speed ?? variant.speed), 0, 2),
+      intensity: clamp(Number(card?.intensity ?? variant.intensity), .35, 1.6),
+      pointer: clamp(Number(card?.pointer ?? variant.pointer), 0, 1.5),
+      surface: clamp(Number(card?.surface ?? variant.surface), 0, 1),
+      seed: Number.isFinite(Number(card?.seed)) ? Number(card.seed) : variant.seed,
+      chart: { enabled: Boolean(card?.chart?.enabled) }
+    };
+  }
+
+  function mergeSettings(raw) {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    const cards = Array.isArray(source.cards) && source.cards.length ? source.cards : DEFAULTS.cards;
+    const unique = new Set();
+    const normalizedCards = cards.slice(0, 12).map(normalizeCard).map((card, index) => {
+      let key = card.key;
+      let n = index + 1;
+      while (unique.has(key)) key = `${card.key}-${++n}`;
+      unique.add(key);
+      return { ...card, key };
+    });
+    return {
+      storageKey: typeof source.storageKey === 'string' && source.storageKey.trim() ? source.storageKey.trim() : CANONICAL_STORAGE_KEY,
+      quality: QUALITY_VALUES.includes(source.quality) ? source.quality : 'auto',
+      interaction: typeof source.interaction === 'boolean' ? source.interaction : true,
+      cards: normalizedCards
+    };
+  }
+
+  function loadSettings(seedConfig) {
+    const base = mergeSettings(seedConfig || window.FLUID_GLASS_CONFIG || DEFAULTS);
+    try {
+      const saved = localStorage.getItem(base.storageKey);
+      return saved ? mergeSettings({ ...base, ...JSON.parse(saved) }) : base;
+    } catch (_) {
+      return base;
+    }
+  }
+
+  let settings = loadSettings();
+
+  function hexToRgb(hex) {
+    const value = parseInt(hex.slice(1), 16);
+    return [((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255];
+  }
+  function mixRgb(from, to, t) {
+    const a = hexToRgb(from), b = hexToRgb(to);
+    return `rgb(${a.map((v, i) => Math.round((v + (b[i] - v) * t) * 255)).join(',')})`;
+  }
+  function materialTokens(surface) {
+    const s = clamp(surface, 0, 1);
+    const light = smoothstep(.25, .46, s);
+    return {
+      surface: s.toFixed(3),
+      shade: (.48 * Math.pow(1 - s, 1.45)).toFixed(3),
+      shadeMid: (.3456 * Math.pow(1 - s, 1.45)).toFixed(3),
+      shadeSoft: (.1536 * Math.pow(1 - s, 1.45)).toFixed(3),
+      topGlow: (.035 * (1 - s)).toFixed(3),
+      bottomShade: (.10 * (1 - s)).toFixed(3),
+      text: mixRgb('#f3fffb', '#16201d', light),
+      title: mixRgb('#d8eee8', '#2b3632', light),
+      muted: mixRgb('#8fa9a2', '#59635f', light),
+      eyebrow: mixRgb('#82a69d', '#66716c', light),
+      change: mixRgb('#819b94', '#59645f', light),
+      edge: (.10 + .22 * s).toFixed(3),
+      light
+    };
+  }
+  function surfaceLabel(value) {
+    const p = Math.round(value * 100);
+    if (p === 0) return '0% · transparent';
+    if (p < 20) return `${p}% · glass`;
+    if (p < 55) return `${p}% · gray glass`;
+    if (p < 100) return `${p}% · bright material`;
+    return '100% · white';
+  }
+  function qualityProfile(requested) {
+    const query = new URLSearchParams(location.search).get('fluid');
+    if (query === 'fallback') return { name: 'fallback', fps: 0, dpr: 1 };
+    if (query === 'eco') requested = 'eco';
+    if (requested === 'fallback') return { name: 'fallback', fps: 0, dpr: 1 };
+    if (requested === 'high') return { name: 'high', fps: 60, dpr: Math.min(devicePixelRatio || 1, 1.8) };
+    if (requested === 'balanced') return { name: 'balanced', fps: 45, dpr: Math.min(devicePixelRatio || 1, 1.35) };
+    if (requested === 'eco') return { name: 'eco', fps: 24, dpr: Math.min(devicePixelRatio || 1, 1) };
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = navigator.connection && navigator.connection.saveData;
+    const lowCpu = (navigator.hardwareConcurrency || 8) <= 4;
+    const lowMemory = (navigator.deviceMemory || 8) <= 4;
+    if (reduced || saveData || lowCpu || lowMemory) return { name: 'eco', fps: reduced ? 15 : 24, dpr: Math.min(devicePixelRatio || 1, 1) };
+    return { name: 'balanced', fps: 45, dpr: Math.min(devicePixelRatio || 1, 1.35) };
+  }
+
+  const VERTEX_SHADER = `    attribute vec2 a_position;
+    varying vec2 v_uv;
+    void main(){
+      v_uv=a_position*.5+.5;
+      gl_Position=vec4(a_position,0.0,1.0);
+    }
+  
+`;
+  const FRAGMENT_SHADER = `    precision highp float;
+    varying vec2 v_uv;
+    uniform vec2 u_resolution;
+    uniform vec2 u_mouse;
+    uniform vec2 u_mouseVelocity;
+    uniform float u_mouseMix;
+    uniform float u_time;
+    uniform float u_speed;
+    uniform float u_intensity;
+    uniform float u_pointer;
+    uniform float u_seed;
+    uniform float u_surfaceOpacity;
+    uniform vec3 u_colorA;
+    uniform vec3 u_colorB;
+    uniform vec3 u_colorC;
+
+    float hash(vec2 p){
+      p=fract(p*vec2(123.34,456.21));
+      p+=dot(p,p+45.32);
+      return fract(p.x*p.y);
+    }
+    float noise(vec2 p){
+      vec2 i=floor(p),f=fract(p);
+      f=f*f*(3.0-2.0*f);
+      return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),f.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),f.x),f.y);
+    }
+    float fbm(vec2 p){
+      float value=0.0;
+      float amp=.53;
+      mat2 rot=mat2(.80,-.60,.60,.80);
+      for(int i=0;i<5;i++){
+        value+=amp*noise(p);
+        p=rot*p*2.02+vec2(17.13,9.27);
+        amp*=.49;
+      }
+      return value;
+    }
+    float softBlob(vec2 p,vec2 center,float radius,float softness){
+      return 1.0-smoothstep(radius-softness,radius+softness,length(p-center));
+    }
+    void main(){
+      vec2 uv=v_uv;
+      float aspect=u_resolution.x/max(1.0,u_resolution.y);
+      vec2 p=(uv-.5)*vec2(aspect,1.0);
+      vec2 mouse=(u_mouse-.5)*vec2(aspect,1.0);
+      vec2 delta=p-mouse;
+      float dist=length(delta);
+      float mouseField=exp(-dist*dist*7.2)*u_mouseMix*u_pointer;
+      vec2 normal=delta/max(dist,.035);
+      vec2 tangent=vec2(-normal.y,normal.x);
+      p+=normal*mouseField*.115+tangent*mouseField*(u_mouseVelocity.x-u_mouseVelocity.y)*.045;
+
+      float t=u_time*u_speed;
+      vec2 seedVec=vec2(u_seed*1.713,u_seed*.937);
+      float w1=fbm(p*1.22+seedVec+vec2(t*.075,-t*.052));
+      float w2=fbm(p*1.54-seedVec*.37+vec2(-t*.057,t*.064)+w1*.82);
+      vec2 q=p+(vec2(w1,w2)-.5)*(.58*u_intensity);
+      float broad=fbm(q*1.12+vec2(t*.041,-t*.033));
+      float detail=fbm(q*2.18+vec2(-t*.083,t*.057)+broad*.95);
+      float ribbon=.5+.5*sin(q.x*3.15+q.y*.76+detail*5.0+t*.25+u_seed);
+      float colorMix=smoothstep(.16,.88,broad*.61+ribbon*.39);
+      vec3 fluid=mix(u_colorA,u_colorB,colorMix);
+      float shadow=smoothstep(.43,.84,detail*.69+(.5+.5*sin(q.y*4.2-q.x*.8-t*.17))*.31);
+      fluid=mix(fluid,u_colorC,shadow*.74);
+
+      float plume1=softBlob(p,vec2(aspect*.23+.12*sin(t*.08+u_seed),.16*cos(t*.11+u_seed)),.52,.38);
+      float plume2=softBlob(p,vec2(aspect*.39+.10*cos(t*.07-u_seed),-.24+.11*sin(t*.09)),.43,.34);
+      float haze=clamp(plume1*.72+plume2*.58,0.0,1.0);
+      float reveal=smoothstep(.055,.735,uv.x+(.5-broad)*.27+.070*sin(uv.y*4.0+t*.12));
+      reveal*=mix(.70,1.0,haze);
+      reveal=clamp(reveal*u_intensity,0.0,1.0);
+
+      float spec=pow(clamp(1.0-abs(detail-.52)*2.0,0.0,1.0),5.0)*reveal;
+      float caustic=pow(clamp(.52+.48*sin((q.x-q.y)*5.2+detail*7.0-t*.18),0.0,1.0),7.0)*reveal;
+      vec3 cyanGlow=mix(fluid,vec3(.34,1.0,.90),spec*.18+caustic*.09);
+      cyanGlow*=.78+.25*haze;
+      cyanGlow=mix(cyanGlow,cyanGlow*.70,u_surfaceOpacity*.34);
+      float filament=smoothstep(.48,.86,detail)*reveal;
+      float density=clamp(reveal*(.36+.48*haze)+filament*.22+mouseField*.28,0.0,1.0);
+      float alpha=clamp(.035*haze+density*(.24+.50*u_intensity)+spec*.08+u_surfaceOpacity*density*.14,0.0,.92);
+      float edgeFade=smoothstep(1.08,.70,length((uv-.5)*vec2(1.0,.92)));
+      alpha*=edgeFade;
+      cyanGlow=pow(max(cyanGlow,0.0),vec3(.94));
+      gl_FragColor=vec4(cyanGlow,alpha);
+    }
+  
+`;
+
+  function compileShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      const message = gl.getShaderInfoLog(shader) || 'Shader compile failed';
+      gl.deleteShader(shader);
+      throw new Error(message);
+    }
+    return shader;
+  }
+  function buildProgram(gl) {
+    const program = gl.createProgram();
+    const vertex = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
+    const fragment = compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || 'Program link failed');
+    gl.deleteShader(vertex);
+    gl.deleteShader(fragment);
+    return program;
+  }
+
+  let liveContexts = 0;
+  const MAX_CONTEXTS = 8;
+
+  class FluidGlassRenderer {
+    constructor(element, config, index, manager) {
+      this.element = element;
+      this.key = config.key;
+      this.index = index;
+      this.manager = manager;
+      this.canvas = element.querySelector('.fg-fluid-canvas');
+      this.config = config;
+      this.gl = null;
+      this.program = null;
+      this.buffer = null;
+      this.uniforms = {};
+      this.active = true;
+      this.failed = false;
+      this.lastFrame = 0;
+      this.mouse = [.76, .46];
+      this.mouseTarget = [.76, .46];
+      this.mouseVelocity = [0, 0];
+      this.mouseMix = 0;
+      this.pointerInside = false;
+      this.controller = new AbortController();
+      this.bindPointer();
+      this.canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); this.fallback('WebGL context lost'); }, { signal: this.controller.signal });
+      this.canvas.addEventListener('webglcontextrestored', () => { this.destroyGl(); this.failed = false; this.init(); }, { signal: this.controller.signal });
+      this.resizeObserver = new ResizeObserver(() => this.resize());
+      this.resizeObserver.observe(element);
+      this.intersectionObserver = new IntersectionObserver((entries) => { this.active = entries[0]?.isIntersecting !== false; }, { rootMargin: '80px' });
+      this.intersectionObserver.observe(element);
+      this.applyCssPalette();
+    }
+    bindPointer() {
+      const signal = this.controller.signal;
+      let last = [0, 0], lastT = 0;
+      const update = (event) => {
+        if (!settings.interaction) return;
+        const rect = this.element.getBoundingClientRect();
+        const x = clamp((event.clientX - rect.left) / Math.max(rect.width, 1), 0, 1);
+        const y = clamp(1 - (event.clientY - rect.top) / Math.max(rect.height, 1), 0, 1);
+        const now = performance.now(), dt = Math.max(8, now - lastT || 16);
+        this.mouseTarget = [x, y];
+        this.mouseVelocity = [clamp((x - last[0]) / (dt / 16.67), -.12, .12), clamp((y - last[1]) / (dt / 16.67), -.12, .12)];
+        last = [x, y];
+        lastT = now;
+        this.mouseMix = 1;
+      };
+      this.element.addEventListener('pointerenter', (event) => { this.pointerInside = true; update(event); }, { signal, passive: true });
+      this.element.addEventListener('pointermove', update, { signal, passive: true });
+      this.element.addEventListener('pointerleave', () => { this.pointerInside = false; this.mouseTarget = [.76, .46]; }, { signal, passive: true });
+      this.element.addEventListener('pointerdown', (event) => { this.mouseMix = 1.2; update(event); }, { signal, passive: true });
+    }
+    init() {
+      const profile = this.manager.profile;
+      if (profile.name === 'fallback') return this.fallback('CSS fallback mode');
+      if (liveContexts >= MAX_CONTEXTS) return this.fallback('WebGL context budget reached');
+      try {
+        const gl = this.canvas.getContext('webgl', {
+          alpha: true,
+          antialias: false,
+          depth: false,
+          stencil: false,
+          premultipliedAlpha: false,
+          preserveDrawingBuffer: false,
+          powerPreference: profile.name === 'eco' ? 'low-power' : 'high-performance'
+        });
+        if (!gl) throw new Error('WebGL context unavailable');
+        this.gl = gl;
+        liveContexts++;
+        gl.clearColor(0, 0, 0, 0);
+        this.program = buildProgram(gl);
+        gl.useProgram(this.program);
+        const buffer = gl.createBuffer();
+        this.buffer = buffer;
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+        const pos = gl.getAttribLocation(this.program, 'a_position');
+        gl.enableVertexAttribArray(pos);
+        gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+        ['u_resolution','u_mouse','u_mouseVelocity','u_mouseMix','u_time','u_speed','u_intensity','u_pointer','u_seed','u_surfaceOpacity','u_colorA','u_colorB','u_colorC'].forEach((name) => { this.uniforms[name] = gl.getUniformLocation(this.program, name); });
+        this.failed = false;
+        this.element.classList.remove('is-fallback');
+        this.resize();
+        return true;
+      } catch (error) {
+        console.warn(`[FluidGlass:${this.key}]`, error);
+        this.fallback(error.message);
+        return false;
+      }
+    }
+    fallback(reason) { this.failed = true; this.destroyGl(); this.element.classList.add('is-fallback'); this.fallbackReason = reason; return false; }
+    destroyGl() {
+      const gl = this.gl;
+      if (gl) {
+        try { if (this.program) gl.deleteProgram(this.program); } catch (_) {}
+        try { if (this.buffer) gl.deleteBuffer(this.buffer); } catch (_) {}
+        try { gl.getExtension('WEBGL_lose_context')?.loseContext(); } catch (_) {}
+        liveContexts = Math.max(0, liveContexts - 1);
+      }
+      this.gl = null; this.program = null; this.buffer = null;
+    }
+    destroy() { this.resizeObserver.disconnect(); this.intersectionObserver.disconnect(); this.controller.abort(); this.destroyGl(); }
+    setProfile() { const shouldFallback = this.manager.profile.name === 'fallback'; if (shouldFallback) { this.fallback('CSS fallback mode'); return; } if (!this.gl) { this.failed = false; this.element.classList.remove('is-fallback'); this.init(); } else this.resize(); }
+    setConfig(config) { this.config = config; this.applyCssPalette(); }
+    applyCssPalette() {
+      const t = materialTokens(this.config.surface);
+      const style = this.element.style;
+      style.setProperty('--fluid-a', this.config.a);
+      style.setProperty('--fluid-b', this.config.b);
+      style.setProperty('--fluid-c', this.config.c);
+      style.setProperty('--surface-opacity', t.surface);
+      style.setProperty('--content-shade', t.shade);
+      style.setProperty('--content-shade-mid', t.shadeMid);
+      style.setProperty('--content-shade-soft', t.shadeSoft);
+      style.setProperty('--top-glow', t.topGlow);
+      style.setProperty('--bottom-shade', t.bottomShade);
+      style.setProperty('--stat-text', t.text);
+      style.setProperty('--stat-title', t.title);
+      style.setProperty('--stat-muted', t.muted);
+      style.setProperty('--stat-eyebrow', t.eyebrow);
+      style.setProperty('--stat-change', t.change);
+      style.setProperty('--edge-highlight', t.edge);
+      this.element.dataset.surfaceTone = t.light > .5 ? 'light' : 'dark';
+    }
+    resize() {
+      if (!this.gl) return;
+      const rect = this.element.getBoundingClientRect();
+      const dpr = this.manager.profile.dpr;
+      const width = Math.max(2, Math.round(rect.width * dpr));
+      const height = Math.max(2, Math.round(rect.height * dpr));
+      if (this.canvas.width !== width || this.canvas.height !== height) {
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.gl.viewport(0, 0, width, height);
+      }
+    }
+    render(now) {
+      if (!this.gl || !this.active || document.hidden) return false;
+      const interval = 1000 / this.manager.profile.fps;
+      if (now - this.lastFrame < interval) return false;
+      this.lastFrame = now;
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.mouse[0] += (this.mouseTarget[0] - this.mouse[0]) * .105;
+      this.mouse[1] += (this.mouseTarget[1] - this.mouse[1]) * .105;
+      this.mouseVelocity[0] *= .90;
+      this.mouseVelocity[1] *= .90;
+      this.mouseMix += ((this.pointerInside && settings.interaction ? 1 : 0) - this.mouseMix) * .075;
+      if (!this.pointerInside) this.mouseMix *= .945;
+      const gl = this.gl, c = this.config;
+      gl.useProgram(this.program);
+      gl.uniform2f(this.uniforms.u_resolution, this.canvas.width, this.canvas.height);
+      gl.uniform2f(this.uniforms.u_mouse, this.mouse[0], this.mouse[1]);
+      gl.uniform2f(this.uniforms.u_mouseVelocity, this.mouseVelocity[0], this.mouseVelocity[1]);
+      gl.uniform1f(this.uniforms.u_mouseMix, settings.interaction ? clamp(this.mouseMix, 0, 1.2) : 0);
+      gl.uniform1f(this.uniforms.u_time, (now * .001) + (this.index * 3.73));
+      gl.uniform1f(this.uniforms.u_speed, reduced ? Math.min(c.speed, .08) : c.speed);
+      gl.uniform1f(this.uniforms.u_intensity, c.intensity);
+      gl.uniform1f(this.uniforms.u_pointer, c.pointer);
+      gl.uniform1f(this.uniforms.u_seed, c.seed);
+      gl.uniform1f(this.uniforms.u_surfaceOpacity, c.surface);
+      gl.uniform3fv(this.uniforms.u_colorA, hexToRgb(c.a));
+      gl.uniform3fv(this.uniforms.u_colorB, hexToRgb(c.b));
+      gl.uniform3fv(this.uniforms.u_colorC, hexToRgb(c.c));
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      return true;
+    }
+    status() { return { key: this.key, mode: this.gl ? 'webgl' : 'fallback', reason: this.fallbackReason || '', canvas: [this.canvas.width, this.canvas.height], palette: { a: this.config.a, b: this.config.b, c: this.config.c }, surface: this.config.surface }; }
+  }
+
+  class FluidGlassManager {
+    constructor() {
+      this.profile = qualityProfile(settings.quality);
+      this.renderers = [];
+      this.running = true;
+      document.querySelectorAll('[data-fluid-glass-key]').forEach((element, index) => {
+        const key = element.dataset.fluidGlassKey;
+        const config = settings.cards.find((card) => card.key === key);
+        if (!config) return;
+        const renderer = new FluidGlassRenderer(element, config, index, this);
+        this.renderers.push(renderer);
+        renderer.init();
+      });
+      this.loop = this.loop.bind(this);
+      this.raf = requestAnimationFrame(this.loop);
+      this.onVisibilityChange = () => { if (!document.hidden) this.renderers.forEach((renderer) => renderer.resize()); };
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
+    }
+    loop(now) { if (this.running) this.renderers.forEach((renderer) => renderer.render(now)); this.raf = requestAnimationFrame(this.loop); }
+    byKey(key) { return this.renderers.find((renderer) => renderer.key === key); }
+    refresh(key) { const renderer = this.byKey(key); const card = settings.cards.find((item) => item.key === key); if (renderer && card) renderer.setConfig(card); }
+    refreshAll() { this.renderers.forEach((renderer) => { const card = settings.cards.find((item) => item.key === renderer.key); if (card) renderer.setConfig(card); }); this.setQuality(settings.quality); }
+    setQuality(value) { settings.quality = value; this.profile = qualityProfile(value); this.renderers.forEach((renderer) => renderer.setProfile()); updateDiagnostic(); }
+    status() { return { requestedQuality: settings.quality, resolvedQuality: this.profile.name, interaction: settings.interaction, cards: this.renderers.map((renderer) => renderer.status()) }; }
+    destroy() { this.running = false; if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0; document.removeEventListener('visibilitychange', this.onVisibilityChange); this.renderers.forEach((renderer) => renderer.destroy()); this.renderers = []; }
+  }
+
+  function cardMarkup(card) {
+    const signClass = card.change >= 0 ? 'fg-change-positive' : 'fg-change-negative';
+    const sign = card.change >= 0 ? '↑' : '↓';
+    return `<article class="fg-card" data-fluid-glass-key="${escapeHtml(card.key)}" data-chart-enabled="${card.chart.enabled}">
+      <canvas class="fg-fluid-canvas" aria-hidden="true"></canvas>
+      <div class="fg-noise" aria-hidden="true"></div>
+      <div class="fg-content">
+        <div class="fg-eyebrow">${escapeHtml(card.eyebrow)}</div>
+        <div class="fg-title">${escapeHtml(card.label)}</div>
+        <div><span class="fg-value">${escapeHtml(card.value)}</span><span class="fg-unit">${escapeHtml(card.unit)}</span></div>
+        <div class="fg-change"><span class="${signClass}">${sign} ${Math.abs(card.change)}%</span></div>
+      </div>
+      <canvas class="fg-chart" aria-hidden="true"></canvas>
+      <div class="fg-fluid-fallback" aria-hidden="true"></div>
+    </article>`;
+  }
+
+  const grid = document.getElementById('fluidGlassGrid');
+  if (!grid) throw new Error('Missing #fluidGlassGrid');
+  grid.innerHTML = settings.cards.map(cardMarkup).join('');
+
+  const manager = new FluidGlassManager();
+  let selectedKey = settings.cards[0].key;
+  const panel = document.getElementById('fluidGlassPanel');
+  const backdrop = document.getElementById('fluidGlassBackdrop');
+  const cardSelect = document.getElementById('fluidGlassCardSelect');
+  const inputs = {
+    a: document.getElementById('fluidGlassColorA'),
+    b: document.getElementById('fluidGlassColorB'),
+    c: document.getElementById('fluidGlassColorC'),
+    speed: document.getElementById('fluidGlassSpeed'),
+    intensity: document.getElementById('fluidGlassIntensity'),
+    pointer: document.getElementById('fluidGlassPointer'),
+    surface: document.getElementById('fluidGlassSurface')
+  };
+  const outputs = {
+    a: document.getElementById('fluidGlassColorAText'),
+    b: document.getElementById('fluidGlassColorBText'),
+    c: document.getElementById('fluidGlassColorCText'),
+    speed: document.getElementById('fluidGlassSpeedValue'),
+    intensity: document.getElementById('fluidGlassIntensityValue'),
+    pointer: document.getElementById('fluidGlassPointerValue'),
+    surface: document.getElementById('fluidGlassSurfaceValue')
+  };
+  const preview = document.getElementById('fluidGlassPreview');
+  const previewName = document.getElementById('fluidGlassPreviewName');
+  const qualitySelect = document.getElementById('fluidGlassQuality');
+  const interaction = document.getElementById('fluidGlassInteraction');
+
+  let saveTimer = 0;
+  function persistSettings() {
+    try {
+      localStorage.setItem(settings.storageKey, JSON.stringify(settings));
+    } catch (error) {
+      console.warn('[FluidGlass:storage]', error);
+    }
+  }
+  function saveSettings(notify = false) {
+    clearTimeout(saveTimer);
+    if (notify) { persistSettings(); showToast('Settings saved'); return; }
+    saveTimer = setTimeout(persistSettings, 200);
+  }
+  function showToast(message) {
+    const el = document.getElementById('fluidGlassToast');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => el.classList.remove('show'), 1850);
+  }
+  function updateDiagnostic() {
+    const el = document.getElementById('fluidGlassDiagnostic');
+    if (!el) return;
+    const count = manager.renderers.filter((renderer) => !!renderer.gl).length;
+    el.classList.toggle('ok', count === manager.renderers.length);
+    el.classList.toggle('warn', count < manager.renderers.length);
+    const mode = manager.profile.name === 'fallback' ? 'CSS fallback' : `${manager.profile.name} · ${count}/${manager.renderers.length} WebGL`;
+    el.querySelector('span').textContent = mode;
+  }
+  function selectedCard() { return settings.cards.find((card) => card.key === selectedKey); }
+  function selectCard(key) {
+    if (!settings.cards.some((card) => card.key === key)) key = settings.cards[0].key;
+    selectedKey = key;
+    if (cardSelect) cardSelect.value = key;
+    document.querySelectorAll('[data-fluid-glass-key]').forEach((element) => element.classList.toggle('is-selected', element.dataset.fluidGlassKey === key));
+    syncPanel();
+  }
+  function syncPanel() {
+    if (!cardSelect || !inputs.a) return;
+    const card = selectedCard();
+    inputs.a.value = card.a;
+    inputs.b.value = card.b;
+    inputs.c.value = card.c;
+    inputs.speed.value = card.speed;
+    inputs.intensity.value = card.intensity;
+    inputs.pointer.value = card.pointer;
+    inputs.surface.value = Math.round(card.surface * 100);
+    outputs.a.textContent = card.a.toUpperCase();
+    outputs.b.textContent = card.b.toUpperCase();
+    outputs.c.textContent = card.c.toUpperCase();
+    outputs.speed.textContent = `${card.speed.toFixed(2)}×`;
+    outputs.intensity.textContent = `${Math.round(card.intensity * 100)}%`;
+    outputs.pointer.textContent = `${Math.round(card.pointer * 100)}%`;
+    outputs.surface.textContent = surfaceLabel(card.surface);
+    const mt = materialTokens(card.surface);
+    preview.style.setProperty('--preview-a', card.a);
+    preview.style.setProperty('--preview-b', card.b);
+    preview.style.setProperty('--preview-c', card.c);
+    preview.style.setProperty('--preview-surface', mt.surface);
+    preview.style.setProperty('--preview-shade', mt.shade);
+    preview.style.setProperty('--preview-shade-mid', mt.shadeMid);
+    preview.style.setProperty('--preview-text', mt.text);
+    preview.style.setProperty('--preview-muted', mt.muted);
+    previewName.textContent = card.label;
+    qualitySelect.value = settings.quality;
+    interaction.checked = settings.interaction;
+    document.querySelectorAll('[data-fluid-glass-preset]').forEach((button) => button.classList.toggle('active', button.dataset.fluidGlassPreset === card.preset));
+    updateDiagnostic();
+  }
+  function applyInputs() {
+    const card = selectedCard();
+    card.a = inputs.a.value;
+    card.b = inputs.b.value;
+    card.c = inputs.c.value;
+    card.speed = Number(inputs.speed.value);
+    card.intensity = Number(inputs.intensity.value);
+    card.pointer = Number(inputs.pointer.value);
+    card.surface = clamp(Number(inputs.surface.value) / 100, 0, 1);
+    card.preset = 'custom';
+    manager.refresh(selectedKey);
+    syncPanel();
+    saveSettings(false);
+  }
+  function openPanel(key = selectedKey) {
+    selectCard(key);
+    backdrop.hidden = false;
+    backdrop.classList.add('is-open');
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+  function closePanel() {
+    panel.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    setTimeout(() => { backdrop.hidden = true; }, 240);
+    document.querySelectorAll('.fg-card').forEach((element) => element.classList.remove('is-selected'));
+  }
+  function resetSelected() {
+    const index = settings.cards.findIndex((card) => card.key === selectedKey);
+    const preserved = { key: settings.cards[index].key, label: settings.cards[index].label, eyebrow: settings.cards[index].eyebrow, value: settings.cards[index].value, unit: settings.cards[index].unit, change: settings.cards[index].change };
+    settings.cards[index] = { ...normalizeCard(preserved, index), ...preserved };
+    manager.refresh(selectedKey);
+    syncPanel();
+    saveSettings(false);
+    showToast('Card material restored');
+  }
+  function applyMaterialToAll() {
+    const source = selectedCard();
+    settings.cards.forEach((card) => Object.assign(card, { a: source.a, b: source.b, c: source.c, surface: source.surface, preset: 'custom' }));
+    manager.refreshAll();
+    syncPanel();
+    saveSettings(false);
+    showToast('Material applied to all cards');
+  }
+  function exportHtml() {
+    const snapshot = clone(settings);
+    const bootstrap = `<script>window.FLUID_GLASS_CONFIG=${JSON.stringify(snapshot).replace(/</g, '\\u003c')};<\/script>`;
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace('</head>', `${bootstrap}</head>`);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'fluid-glass-interface.html';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1200);
+  }
+
+  if (cardSelect) {
+    cardSelect.innerHTML = settings.cards.map((card) => `<option value="${escapeHtml(card.key)}">${escapeHtml(card.label)}</option>`).join('');
+  }
+  document.getElementById('fluidGlassSettingsButton')?.addEventListener('click', () => openPanel());
+  document.getElementById('fluidGlassPanelClose')?.addEventListener('click', closePanel);
+  backdrop?.addEventListener('click', closePanel);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && panel.classList.contains('is-open')) closePanel(); });
+  cardSelect?.addEventListener('change', () => selectCard(cardSelect.value));
+  Object.values(inputs).forEach((input) => input?.addEventListener('input', applyInputs));
+  document.querySelectorAll('[data-fluid-glass-preset]').forEach((button) => button.addEventListener('click', () => {
+    const name = button.dataset.fluidGlassPreset;
+    const card = selectedCard();
+    Object.assign(card, PRESETS[name], { preset: name });
+    manager.refresh(selectedKey);
+    syncPanel();
+    saveSettings(false);
+  }));
+  qualitySelect?.addEventListener('change', () => { manager.setQuality(qualitySelect.value); saveSettings(false); });
+  interaction?.addEventListener('change', () => { settings.interaction = interaction.checked; saveSettings(false); });
+  document.getElementById('fluidGlassResetCard')?.addEventListener('click', resetSelected);
+  document.getElementById('fluidGlassApplyAll')?.addEventListener('click', applyMaterialToAll);
+  document.getElementById('fluidGlassSaveSettings')?.addEventListener('click', () => { saveSettings(true); closePanel(); });
+  document.getElementById('fluidGlassExport')?.addEventListener('click', exportHtml);
+
+  selectCard(selectedKey);
+  updateDiagnostic();
+  setTimeout(updateDiagnostic, 300);
+
+  window.FluidGlassMaterial = {
+    getConfig: () => clone(settings),
+    getStatus: () => manager.status(),
+    openSettings: openPanel,
+    closeSettings: closePanel,
+    save: () => saveSettings(true),
+    exportHtml,
+    pause: () => { manager.running = false; },
+    resume: () => { manager.running = true; },
+    setQuality: (value) => { if (QUALITY_VALUES.includes(value)) { manager.setQuality(value); qualitySelect.value = value; saveSettings(false); } },
+    setPalette: (key, preset) => { const card = settings.cards.find((item) => item.key === key); if (card && PRESETS[preset]) { Object.assign(card, PRESETS[preset], { preset }); manager.refresh(key); if (key === selectedKey) syncPanel(); } },
+    setColors: (key, a, b, c) => { const card = settings.cards.find((item) => item.key === key); if (card) { card.a = safeHex(a, card.a); card.b = safeHex(b, card.b); card.c = safeHex(c, card.c); card.preset = 'custom'; manager.refresh(key); if (key === selectedKey) syncPanel(); } },
+    setSurface: (key, value) => { const card = settings.cards.find((item) => item.key === key); if (card) { card.surface = clamp(Number(value), 0, 1); manager.refresh(key); if (key === selectedKey) syncPanel(); } },
+    setMotion: (key, patch) => { const card = settings.cards.find((item) => item.key === key); if (card) { if (patch.speed != null) card.speed = clamp(Number(patch.speed), 0, 2); if (patch.intensity != null) card.intensity = clamp(Number(patch.intensity), .35, 1.6); if (patch.pointer != null) card.pointer = clamp(Number(patch.pointer), 0, 1.5); manager.refresh(key); if (key === selectedKey) syncPanel(); } }
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluid Glass Material — Canonical Reference</title>
+<link rel="stylesheet" href="fluid-glass-material.css">
+<script>window.FLUID_GLASS_CONFIG = {"storageKey": "fluid_glass_material_config", "quality": "auto", "interaction": true, "cards": [{"key": "card-01", "label": "Metric 01", "eyebrow": "SIGNAL 01", "value": "12", "unit": "units", "change": 20, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.92, "intensity": 1.02, "pointer": 0.82, "surface": 0.08, "seed": 1.7, "chart": {"enabled": false}}, {"key": "card-02", "label": "Metric 02", "eyebrow": "SIGNAL 02", "value": "28", "unit": "units", "change": 8, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.84, "intensity": 1.08, "pointer": 0.8, "surface": 0.08, "seed": 4.9, "chart": {"enabled": false}}, {"key": "card-03", "label": "Metric 03", "eyebrow": "SIGNAL 03", "value": "56", "unit": "units", "change": 15, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.76, "intensity": 0.98, "pointer": 0.72, "surface": 0.08, "seed": 8.4, "chart": {"enabled": false}}, {"key": "card-04", "label": "Metric 04", "eyebrow": "SIGNAL 04", "value": "3", "unit": "units", "change": -40, "preset": "cyan", "a": "#00e7d2", "b": "#3cc8ff", "c": "#075f68", "speed": 0.88, "intensity": 1.05, "pointer": 0.86, "surface": 0.08, "seed": 12.1, "chart": {"enabled": false}}]};</script>
+</head>
+<body>
+  <main class="fg-shell">
+    <header class="fg-toolbar">
+      <div class="fg-brand"><span class="fg-brand-dot"></span><span>Fluid Glass Material</span></div>
+      <div class="fg-toolbar-actions">
+        <button class="fg-icon-button" id="fluidGlassExport" type="button" aria-label="Export HTML">
+          <svg viewBox="0 0 24 24"><path d="M12 4v11M8 8l4-4 4 4M4 20h16"/></svg>
+        </button>
+        <button class="fg-icon-button" id="fluidGlassSettingsButton" type="button" aria-label="Open settings">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M8 14v6"/></svg>
+        </button>
+      </div>
+    </header>
+    <section class="fg-grid" id="fluidGlassGrid" aria-label="Fluid glass cards"></section>
+  </main>
+
+  <div class="fg-panel-backdrop" id="fluidGlassBackdrop" hidden></div>
+  <aside class="fg-panel" id="fluidGlassPanel" aria-hidden="true" aria-labelledby="fluidGlassPanelTitle">
+    <div class="fg-panel-head">
+      <div><span class="fg-panel-kicker">CANONICAL MATERIAL CORE</span><h2 id="fluidGlassPanelTitle">Fluid glass settings</h2></div>
+      <button class="fg-panel-close" id="fluidGlassPanelClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="fg-panel-body">
+      <label class="fg-field"><span>Current card</span><select id="fluidGlassCardSelect"></select></label>
+      <div class="fg-preview" id="fluidGlassPreview"><div class="fg-preview-copy"><small>LIVE MATERIAL</small><b id="fluidGlassPreviewName">Metric 01</b><span>Transparent glass · cyan fluid</span></div></div>
+      <fieldset class="fg-fieldset"><legend>Palette presets</legend><div class="fg-presets">
+        <button type="button" data-fluid-glass-preset="cyan"><i style="--a:#00e7d2;--b:#3cc8ff;--c:#075f68"></i><span>Cyan</span></button>
+        <button type="button" data-fluid-glass-preset="original"><i style="--a:#ff3aa7;--b:#ff8050;--c:#a443ff"></i><span>Original</span></button>
+        <button type="button" data-fluid-glass-preset="klein"><i style="--a:#3158ff;--b:#ff6531;--c:#20252e"></i><span>Klein</span></button>
+        <button type="button" data-fluid-glass-preset="chrome"><i style="--a:#eef2f3;--b:#6c7780;--c:#11171d"></i><span>Chrome</span></button>
+      </div></fieldset>
+      <fieldset class="fg-fieldset"><legend>Custom colors</legend><div class="fg-color-grid">
+        <label><span>Color A</span><input type="color" id="fluidGlassColorA"><code id="fluidGlassColorAText"></code></label>
+        <label><span>Color B</span><input type="color" id="fluidGlassColorB"><code id="fluidGlassColorBText"></code></label>
+        <label><span>Shadow C</span><input type="color" id="fluidGlassColorC"><code id="fluidGlassColorCText"></code></label>
+      </div></fieldset>
+      <fieldset class="fg-fieldset"><legend>Card surface</legend>
+        <label class="fg-range"><span>Surface opacity <output id="fluidGlassSurfaceValue"></output></span><input type="range" id="fluidGlassSurface" min="0" max="100" step="1"></label>
+      </fieldset>
+      <fieldset class="fg-fieldset"><legend>Motion</legend>
+        <label class="fg-range"><span>Flow speed <output id="fluidGlassSpeedValue"></output></span><input type="range" id="fluidGlassSpeed" min="0" max="2" step="0.05"></label>
+        <label class="fg-range"><span>Fluid intensity <output id="fluidGlassIntensityValue"></output></span><input type="range" id="fluidGlassIntensity" min="0.35" max="1.6" step="0.05"></label>
+        <label class="fg-range"><span>Pointer disturbance <output id="fluidGlassPointerValue"></output></span><input type="range" id="fluidGlassPointer" min="0" max="1.5" step="0.05"></label>
+      </fieldset>
+      <fieldset class="fg-fieldset"><legend>Performance</legend>
+        <label class="fg-field"><span>Render quality</span><select id="fluidGlassQuality"><option value="auto">Auto</option><option value="high">High</option><option value="balanced">Balanced</option><option value="eco">Eco</option><option value="fallback">CSS fallback</option></select></label>
+        <label class="fg-switch"><span><b>Pointer interaction</b><small>Push and curl the fluid</small></span><input type="checkbox" id="fluidGlassInteraction"><i></i></label>
+        <div class="fg-diagnostic" id="fluidGlassDiagnostic"><i></i><span>Detecting WebGL…</span></div>
+      </fieldset>
+    </div>
+    <div class="fg-panel-actions">
+      <button type="button" id="fluidGlassResetCard">Restore card</button>
+      <button type="button" id="fluidGlassApplyAll">Apply material to all</button>
+      <button type="button" class="primary" id="fluidGlassSaveSettings">Save settings</button>
+    </div>
+  </aside>
+  <div class="fg-toast" id="fluidGlassToast">Saved</div>
+  <script src="fluid-glass-engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "fluidglass-ui",
+  "displayName": "Fluid Glass UI",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "agent-skill",
+  "language": [
+    "zh-CN",
+    "en"
+  ],
+  "entry": "SKILL.md",
+  "canonicalCore": {
+    "shader": "references/canonical-fragment-shader.glsl",
+    "vertexShader": "references/canonical-vertex-shader.glsl",
+    "material": "references/fluid-glass-material.css",
+    "engine": "references/fluid-glass-engine.js",
+    "demo": "references/canonical-demo.html",
+    "visualReference": "references/canonical-reference.png",
+    "singleFileDemo": "references/canonical-demo-single-file.html"
+  },
+  "features": [
+    "webgl-fluid",
+    "transparent-glass",
+    "pointer-disturbance",
+    "quality-profiles",
+    "css-fallback",
+    "local-storage",
+    "html-export",
+    "data-driven-cards"
+  ],
+  "telemetry": false,
+  "networkRequired": false
+}

@@ -1,0 +1,26 @@
+{
+  "references/canonical-vertex-shader.glsl": {
+    "sha256": "2d756428fea45c5c62bd4f06a4ccfb20dd33225a5d873cc6482764435f91b6b6",
+    "bytes": 153
+  },
+  "references/canonical-fragment-shader.glsl": {
+    "sha256": "e6bc686c2e19b842963a253eb4f610bc952fa8f4e055ce2fb9cda5ca3065463e",
+    "bytes": 3547
+  },
+  "references/fluid-glass-material.css": {
+    "sha256": "6662644243a66cedaebfb31688af5d5ca46e15c6796886e98ec4fbb5013138d1",
+    "bytes": 15517
+  },
+  "references/fluid-glass-engine.js": {
+    "sha256": "5f9809ce4ecce401c0ea5325893f495dbfc734f6a097bcc85a9177de320db7bd",
+    "bytes": 34871
+  },
+  "references/canonical-demo-single-file.html": {
+    "sha256": "dec0668b925cac1f2e876750b1da2746652bb4674ba8a2742c8da12280075b79",
+    "bytes": 56642
+  },
+  "references/canonical-reference.png": {
+    "sha256": "7a13536a2cb636ebc3a337c78edad282162e2224cc25b46b7fc1635850c17b73",
+    "bytes": 109336
+  }
+}
