@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="fg-title fg-desc">
+  <title id="fg-title">Fluid Glass UI</title>
+  <desc id="fg-desc">Fluid Glass UI: production-grade WebGL fluid glass metric cards with a fixed canonical material core and open business configuration, shown as three tilting glass cards assembled by a fluid flow line.</desc>
+  <defs>
+    <radialGradient id="fluid-a" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00e7d2" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#075f68" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fluid-b" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3cc8ff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#075f68" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fluid-c" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#075f68" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#075f68" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bg-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#04070b"/>
+      <stop offset="100%" stop-color="#060a10"/>
+    </linearGradient>
+  </defs>
+  <rect id="frame" width="1200" height="360" rx="26" fill="url(#bg-g)"/>
+  <g id="flow-line">
+    <path d="M 640 292 C 730 322, 830 268, 908 286 C 990 304, 1080 250, 1176 276" fill="none" stroke="#00e7d2" stroke-opacity="0.35" stroke-width="2"/>
+    <circle cx="640" cy="292" r="4" fill="#00e7d2" fill-opacity="0.8"/>
+    <circle cx="1176" cy="276" r="4" fill="#00e7d2" fill-opacity="0.8"/>
+  </g>
+  <g id="card-l" transform="translate(726 196) rotate(-5)"><clipPath id="clip-card-l"><rect x="-94.0" y="-73.0" width="188" height="146" rx="30"/></clipPath><rect x="-94.0" y="-73.0" width="188" height="146" rx="30" fill="#06131a" fill-opacity="0.55"/><g clip-path="url(#clip-card-l)"><ellipse cx="-34" cy="44" rx="103" ry="61" fill="url(#fluid-a)" opacity="0.85"/><ellipse cx="41" cy="-15" rx="94" ry="55" fill="url(#fluid-b)" opacity="0.8"/><ellipse cx="9" cy="76" rx="79" ry="44" fill="url(#fluid-c)" opacity="0.75"/><rect x="-94.0" y="-73.0" width="188" height="61" fill="url(#sheen-g)" opacity="0.55"/></g><rect x="-94.0" y="-73.0" width="188" height="146" rx="30" fill="none" stroke="#bfeef5" stroke-opacity="0.32" stroke-width="1.3"/><text x="-74.0" y="-39.0" font-family="Consolas, ui-monospace, monospace" font-size="13" letter-spacing="2.5" fill="#00e7d2">MONTHLY</text><text x="-74.0" y="-5.0" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" fill="#b9cdd4">Revenue</text><text x="-74.0" y="37.0" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="40" font-weight="800" fill="#eef6f9">12.8M</text><text x="-72.0" y="59.0" font-family="Consolas, ui-monospace, monospace" font-size="13" fill="#9db4bc" letter-spacing="1.5">USD</text><text x="74.0" y="59.0" text-anchor="end" font-family="Consolas, ui-monospace, monospace" font-size="14" fill="#00e7d2">+8.4%</text></g><g id="card-c" transform="translate(898 184) rotate(0)"><clipPath id="clip-card-c"><rect x="-99.0" y="-77.0" width="198" height="154" rx="30"/></clipPath><rect x="-99.0" y="-77.0" width="198" height="154" rx="30" fill="#06131a" fill-opacity="0.55"/><g clip-path="url(#clip-card-c)"><ellipse cx="-36" cy="46" rx="109" ry="65" fill="url(#fluid-a)" opacity="0.85"/><ellipse cx="44" cy="-15" rx="99" ry="59" fill="url(#fluid-b)" opacity="0.8"/><ellipse cx="10" cy="80" rx="83" ry="46" fill="url(#fluid-c)" opacity="0.75"/><rect x="-99.0" y="-77.0" width="198" height="65" fill="url(#sheen-g)" opacity="0.55"/></g><rect x="-99.0" y="-77.0" width="198" height="154" rx="30" fill="none" stroke="#bfeef5" stroke-opacity="0.32" stroke-width="1.3"/><text x="-79.0" y="-43.0" font-family="Consolas, ui-monospace, monospace" font-size="13" letter-spacing="2.5" fill="#00e7d2">QUALITY</text><text x="-79.0" y="-9.0" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" fill="#b9cdd4">Render</text><text x="-79.0" y="33.0" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="40" font-weight="800" fill="#eef6f9">60</text><text x="-77.0" y="55.0" font-family="Consolas, ui-monospace, monospace" font-size="13" fill="#9db4bc" letter-spacing="1.5">FPS</text><text x="79.0" y="55.0" text-anchor="end" font-family="Consolas, ui-monospace, monospace" font-size="14" fill="#00e7d2">auto</text></g><g id="card-r" transform="translate(1074 198) rotate(4)"><clipPath id="clip-card-r"><rect x="-94.0" y="-73.0" width="188" height="146" rx="30"/></clipPath><rect x="-94.0" y="-73.0" width="188" height="146" rx="30" fill="#06131a" fill-opacity="0.55"/><g clip-path="url(#clip-card-r)"><ellipse cx="-34" cy="44" rx="103" ry="61" fill="url(#fluid-a)" opacity="0.85"/><ellipse cx="41" cy="-15" rx="94" ry="55" fill="url(#fluid-b)" opacity="0.8"/><ellipse cx="9" cy="76" rx="79" ry="44" fill="url(#fluid-c)" opacity="0.75"/><rect x="-94.0" y="-73.0" width="188" height="61" fill="url(#sheen-g)" opacity="0.55"/></g><rect x="-94.0" y="-73.0" width="188" height="146" rx="30" fill="none" stroke="#bfeef5" stroke-opacity="0.32" stroke-width="1.3"/><text x="-74.0" y="-39.0" font-family="Consolas, ui-monospace, monospace" font-size="13" letter-spacing="2.5" fill="#00e7d2">BUDGET</text><text x="-74.0" y="-5.0" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" fill="#b9cdd4">Contexts</text><text x="-74.0" y="37.0" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="40" font-weight="800" fill="#eef6f9">8</text><text x="-72.0" y="59.0" font-family="Consolas, ui-monospace, monospace" font-size="13" fill="#9db4bc" letter-spacing="1.5">MAX</text><text x="74.0" y="59.0" text-anchor="end" font-family="Consolas, ui-monospace, monospace" font-size="14" fill="#00e7d2">safe</text></g>
+  <g id="ripple">
+    <circle cx="786" cy="266" r="16" fill="none" stroke="#8fe9f5" stroke-opacity="0.55" stroke-width="2"/>
+    <circle cx="786" cy="266" r="34" fill="none" stroke="#8fe9f5" stroke-opacity="0.3" stroke-width="1.6"/>
+    <circle cx="786" cy="266" r="52" fill="none" stroke="#8fe9f5" stroke-opacity="0.14" stroke-width="1.2"/>
+  </g>
+  <g id="title-block" transform="translate(64 0)" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif">
+    <text x="0" y="88" font-family="Consolas, ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" letter-spacing="3" fill="#5fb6c4">WEBGL FLUID MATERIAL &#183; CANONICAL CORE &#183; AGENT SKILL</text>
+    <text x="0" y="160" font-size="68" font-weight="800" fill="#eef6f9">Fluid Glass UI</text>
+    <text x="2" y="202" font-size="22" fill="#b3c4cb">Fixed material DNA. Open business configuration.</text>
+    <text x="2" y="236" font-size="19" fill="#7f939b">固定材质内核 &#215; 开放业务配置 &#183; 同一套视觉，数据随你定义</text>
+    <g fill="#cfe6ec">
+      <g transform="translate(0 272)"><rect width="170" height="40" rx="10" fill="#00e7d2" fill-opacity="0.08" stroke="#00e7d2" stroke-opacity="0.4"/><text x="16" y="26" font-size="17">144px &#183; 30rx</text></g>
+      <g transform="translate(184 272)"><rect width="196" height="40" rx="10" fill="#00e7d2" fill-opacity="0.08" stroke="#00e7d2" stroke-opacity="0.4"/><text x="16" y="26" font-size="17">8 context budget</text></g>
+      <g transform="translate(394 272)"><rect width="160" height="40" rx="10" fill="#00e7d2" fill-opacity="0.08" stroke="#00e7d2" stroke-opacity="0.4"/><text x="16" y="26" font-size="17">CSS fallback</text></g>
+    </g>
+  </g>
+</svg>

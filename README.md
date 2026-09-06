@@ -1,12 +1,22 @@
-# Fluid Glass UI
+<p align="center">
+  <img src="./assets/readme/hero.gif" width="100%" alt="Fluid Glass UI — three tilting WebGL fluid glass metric cards (Revenue 12.8M USD, Render 60 FPS, Contexts 8 MAX) assembled by a cyan flow line over a dark canvas, with a pointer-disturbance ripple.">
+</p>
 
-[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+<h1 align="center">Fluid Glass UI</h1>
 
-**English · [中文](README.zh-CN.md)**
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-blue.svg" alt="Apache-2.0 License"></a>
+  <img src="https://img.shields.io/badge/dependencies-0-00e7d2.svg" alt="0 dependencies">
+  <img src="https://img.shields.io/badge/agent-skill-00e7d2.svg" alt="agent skill">
+</p>
+
+<p align="center"><strong>English · <a href="README.zh-CN.md">中文</a></strong></p>
 
 Production-grade **WebGL fluid glass card interfaces** with a fixed canonical material core and an open, data-driven business configuration — packaged as an installable **agent skill** and a **zero-dependency front-end reference implementation**.
 
 Open the [single-file demo](references/canonical-demo-single-file.html) directly in any modern browser to see the result: transparent fluid glass cards, pointer disturbance, and graceful CSS fallback.
+
+## Live demo
 
 ![Fluid glass demo animation](docs/demo.gif)
 

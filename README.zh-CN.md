@@ -1,12 +1,22 @@
-# Fluid Glass UI
+<p align="center">
+  <img src="./assets/readme/hero.gif" width="100%" alt="Fluid Glass UI——三张倾斜的 WebGL 流体玻璃指标卡片（Revenue 12.8M USD、Render 60 FPS、Contexts 8 MAX）由青色流线串联汇聚，深色画布上带指针扰动涟漪。">
+</p>
 
-[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+<h1 align="center">Fluid Glass UI</h1>
 
-[English](README.md) · **中文**
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-blue.svg" alt="Apache-2.0 License"></a>
+  <img src="https://img.shields.io/badge/%E4%BE%9D%E8%B5%96-0-00e7d2.svg" alt="0 dependencies">
+  <img src="https://img.shields.io/badge/Agent-%E6%8A%80%E8%83%BD%E5%8C%85-00e7d2.svg" alt="agent skill">
+</p>
+
+<p align="center"><a href="README.md">English</a> · <strong>中文</strong></p>
 
 **WebGL 流体玻璃卡片界面生成器**：固定视觉内核（Canonical Material Core）+ 开放、数据驱动的业务配置。既是一个可安装到编码 Agent 的**技能包**，也是一份**零依赖的前端参考实现**。
 
 用现代浏览器直接打开[单文件 Demo](references/canonical-demo-single-file.html)，即可看到效果：透明流体玻璃卡片、鼠标扰动、优雅的 CSS 降级。
+
+## 实机演示
 
 ![流体玻璃动效演示](docs/demo.gif)
 
